@@ -20,5 +20,38 @@
         "images": ["https://example.com/image2.jpg"],
         "video": "",
         "isNew": false
-    }
+    },
+        {
+        "id": 3,
+        "name": "জামদানি শাড়ি",
+        "category": "shari",
+        "price": 5000,
+        "discount": 20,
+        "commission": 500,
+        "images": ["https://example.com/image1.jpg"],
+        "video": "",
+        "isNew": true
+    },
+        {
+        "id": 4,
+        "name": "জামদানি শাড়ি",
+        "category": "shari",
+        "price": 5000,
+        "discount": 20,
+        "commission": 500,
+        "images": ["https://example.com/image1.jpg"],
+        "video": "",
+        "isNew": true
+    },
+        {
+        "id": 5,
+        "name": "জামদানি শাড়ি",
+        "category": "shari",
+        "price": 5000,
+        "discount": 20,
+        "commission": 500,
+        "images": ["https://example.com/image1.jpg"],
+        "video": "",
+        "isNew": true
+    },
 ]
