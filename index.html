@@ -590,7 +590,7 @@
         let selectedFile = null;
         let currentLink = '';
         let currentStream = null;
-        let facingMode = 'user';
+        let facingMode = 'user'; // CHANGED: 'environment' → 'user'
         let isViewerMode = false;
 
         // Tab Switching
@@ -1165,73 +1165,85 @@
             }
         }
 
-function startViewerCountdown(expiryTime, imageKey) {
-    const updateCountdown = () => {
-        const now = Date.now();
-        const timeLeft = expiryTime - now;
-        
-        if (timeLeft <= 0) {
-            localStorage.removeItem(imageKey);
-            
-            // ছবি লোড করা এলিমেন্টটি খুঁজে নিন
-            const imageDisplay = document.getElementById('imageDisplay');
-            const imageContainer = document.getElementById('imageContainer');
-            const countdownElement = document.getElementById('countdownTimer');
-            
-            if (imageDisplay) {
-                // ছবির src ক্লিয়ার করুন
-                imageDisplay.src = '';
-                // ছবি হাইড করুন
-                imageDisplay.style.display = 'none';
-            }
-            
-            if (imageContainer) {
-                // একটি এক্সপায়ার মেসেজ দেখান
-                imageContainer.innerHTML = '<div style="color: #dc3545; font-size: 24px; padding: 40px;"><i class="fas fa-exclamation-triangle"></i> Image expired!</div>';
-            }
-            
-            if (countdownElement) {
-                countdownElement.textContent = '00:00';
-                countdownElement.style.color = '#dc3545';
-            }
-            
-            // কাউন্টডাউন ইন্টারভাল বন্ধ করুন
-            if (window.viewerCountdownInterval) {
-                clearInterval(window.viewerCountdownInterval);
-            }
-            return;
+        // Show expired message
+        function showExpiredMessage() {
+            mainApp.innerHTML = `
+                <div class="viewer-container" style="background: rgba(30, 30, 46, 0.95); padding: 40px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); text-align: center;">
+                    <h1 style="color: #dc3545; margin-bottom: 20px;"><i class="fas fa-exclamation-triangle"></i> Image Expired</h1>
+                    <p style="color: #a0a0c0; margin-bottom: 30px; font-size: 18px;">
+                        This secure image has expired and has been permanently deleted.
+                    </p>
+                    <button class="btn" onclick="window.location.href='./'">
+                        <i class="fas fa-arrow-left"></i> Back to Upload
+                    </button>
+                </div>
+            `;
         }
-        
-        // Calculate minutes and seconds
-        const minutes = Math.floor(timeLeft / 60000);
-        const seconds = Math.floor((timeLeft % 60000) / 1000);
-        
-        // Format as MM:SS
-        const formattedTime = 
-            minutes.toString().padStart(2, '0') + ':' + 
-            seconds.toString().padStart(2, '0');
-        
-        // Update display
-        const countdownElement = document.getElementById('countdownTimer');
-        if (countdownElement) {
-            countdownElement.textContent = formattedTime;
-            
-            // Change color when less than 10 seconds
-            if (timeLeft < 10000) {
-                countdownElement.style.color = '#ff6b6b';
-            }
-        }
-    };
-    
-    // Update immediately
-    updateCountdown();
-    
-    // Update every second
-    const countdownInterval = setInterval(updateCountdown, 1000);
-    
-    // Store interval ID to clear if needed
-    window.viewerCountdownInterval = countdownInterval;
-}
+
+        // Start countdown for viewer - UPDATED VERSION
+        function startViewerCountdown(expiryTime, imageKey) {
+            const updateCountdown = () => {
+                const now = Date.now();
+                const timeLeft = expiryTime - now;
+                
+                if (timeLeft <= 0) {
+                    localStorage.removeItem(imageKey);
+                    
+                    // ছবি লোড করা এলিমেন্টটি খুঁজে নিন
+                    const imageDisplay = document.getElementById('imageDisplay');
+                    const imageContainer = document.getElementById('imageContainer');
+                    const countdownElement = document.getElementById('countdownTimer');
+                    
+                    if (imageDisplay) {
+                        // ছবির src ক্লিয়ার করুন
+                        imageDisplay.src = '';
+                        // ছবি হাইড করুন
+                        imageDisplay.style.display = 'none';
+                    }
+                    
+                    if (imageContainer) {
+                        // একটি এক্সপায়ার মেসেজ দেখান
+                        imageContainer.innerHTML = '<div style="color: #dc3545; font-size: 24px; padding: 40px;"><i class="fas fa-exclamation-triangle"></i> Image expired!</div>';
+                    }
+                    
+                    if (countdownElement) {
+                        countdownElement.textContent = '00:00';
+                        countdownElement.style.color = '#dc3545';
+                    }
+                    
+                    // কাউন্টডাউন ইন্টারভাল বন্ধ করুন
+                    if (window.viewerCountdownInterval) {
+                        clearInterval(window.viewerCountdownInterval);
+                    }
+                    
+                    // 2 সেকেন্ড পরে সম্পূর্ণ এক্সপায়ার মেসেজ দেখান
+                    setTimeout(() => {
+                        showExpiredMessage();
+                    }, 2000);
+                    
+                    return;
+                }
+                
+                // Calculate minutes and seconds
+                const minutes = Math.floor(timeLeft / 60000);
+                const seconds = Math.floor((timeLeft % 60000) / 1000);
+                
+                // Format as MM:SS
+                const formattedTime = 
+                    minutes.toString().padStart(2, '0') + ':' + 
+                    seconds.toString().padStart(2, '0');
+                
+                // Update display
+                const countdownElement = document.getElementById('countdownTimer');
+                if (countdownElement) {
+                    countdownElement.textContent = formattedTime;
+                    
+                    // Change color when less than 10 seconds
+                    if (timeLeft < 10000) {
+                        countdownElement.style.color = '#ff6b6b';
+                    }
+                }
+            };
             
             // Update immediately
             updateCountdown();
@@ -1242,8 +1254,6 @@ function startViewerCountdown(expiryTime, imageKey) {
             // Store interval ID to clear if needed
             window.viewerCountdownInterval = countdownInterval;
         }
-
-
 
         // Show message
         function showMessage(text, type) {
