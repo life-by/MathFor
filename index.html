@@ -1219,27 +1219,7 @@
             window.viewerCountdownInterval = countdownInterval;
         }
 
-        // Show expired message
-        function showExpiredMessage() {
-            mainApp.innerHTML = `
-                <div class="viewer-container" style="background: rgba(30, 30, 46, 0.95); padding: 40px; border-radius: 20px; text-align: center;">
-                    <h1 style="color: #fff; margin-bottom: 30px;"><i class="fas fa-clock"></i> Image Expired</h1>
-                    
-                    <div style="color: #dc3545; margin: 30px 0;">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 60px;"></i>
-                        <p style="margin-top: 20px; font-size: 18px;">This image link has expired</p>
-                    </div>
-                    
-                    <p style="color: #a0a0c0; margin: 20px 0;">
-                        The image has been automatically deleted for security reasons.
-                    </p>
-                    
-                    <button class="btn" onclick="window.location.href='./'" style="margin-top: 20px;">
-                        <i class="fas fa-arrow-left"></i> Create New Secure Link
-                    </button>
-                </div>
-            `;
-        }
+
 
         // Show message
         function showMessage(text, type) {
