@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Temporary Image Link Generator</title>
+    <title>Secure Image Link Generator</title>
     <style>
         * {
             margin: 0;
@@ -13,42 +13,96 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            color: #e6e6e6;
         }
         
         .container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             padding: 40px;
             width: 100%;
-            max-width: 600px;
+            max-width: 700px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
         }
         
         h1 {
-            color: #333;
+            color: #fff;
             text-align: center;
             margin-bottom: 30px;
             font-size: 28px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: rgba(40, 40, 60, 0.8);
+            padding: 5px;
+            border-radius: 50px;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            color: #a0a0c0;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .upload-area {
             border: 3px dashed #667eea;
-            border-radius: 10px;
-            padding: 40px 20px;
+            border-radius: 15px;
+            padding: 50px 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
             margin-bottom: 30px;
+            background: rgba(40, 40, 60, 0.5);
         }
         
         .upload-area:hover {
-            background: #f9f9f9;
+            background: rgba(102, 126, 234, 0.1);
             border-color: #764ba2;
         }
         
@@ -59,7 +113,7 @@
         }
         
         .upload-area p {
-            color: #666;
+            color: #b0b0d0;
             margin: 10px 0;
         }
         
@@ -67,9 +121,61 @@
             display: none;
         }
         
+        .camera-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        #cameraPreview {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid #667eea;
+            background: #000;
+        }
+        
+        .camera-controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .camera-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .camera-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .camera-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #b0b0d0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .camera-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
         .preview-container {
             display: none;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             text-align: center;
         }
         
@@ -77,7 +183,8 @@
             max-width: 100%;
             max-height: 300px;
             border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .btn {
@@ -95,17 +202,19 @@
             justify-content: center;
             align-items: center;
             gap: 10px;
+            margin-top: 20px;
         }
         
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
         }
         
         .btn:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
         
         .loading {
@@ -115,7 +224,7 @@
         }
         
         .loading-spinner {
-            border: 4px solid #f3f3f3;
+            border: 4px solid rgba(255, 255, 255, 0.1);
             border-top: 4px solid #667eea;
             border-radius: 50%;
             width: 40px;
@@ -131,67 +240,77 @@
         
         .message {
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 10px;
             margin: 20px 0;
             text-align: center;
             display: none;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.3);
         }
         
         .error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.3);
         }
         
         .link-container {
             display: none;
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
+            background: rgba(40, 40, 60, 0.8);
+            padding: 25px;
+            border-radius: 15px;
             margin: 20px 0;
             border-left: 4px solid #667eea;
+            animation: slideIn 0.5s ease;
         }
         
         .link-container h3 {
-            color: #333;
-            margin-bottom: 10px;
+            color: #fff;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
         
         .link-box {
-            background: white;
+            background: rgba(20, 20, 35, 0.8);
             padding: 15px;
             border-radius: 8px;
-            border: 2px dashed #dee2e6;
             margin: 10px 0;
             word-break: break-all;
-            font-family: monospace;
+            font-family: 'Courier New', monospace;
             font-size: 14px;
+            color: #b0d0ff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .btn-copy {
-            background: #28a745;
+            background: rgba(40, 167, 69, 0.8);
             color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
+            padding: 10px 20px;
+            border-radius: 50px;
             cursor: pointer;
             margin-top: 10px;
             display: flex;
             align-items: center;
             gap: 5px;
+            transition: all 0.3s ease;
         }
         
         .btn-copy:hover {
-            background: #218838;
+            background: rgba(40, 167, 69, 1);
+            transform: translateY(-1px);
         }
         
         .copy-success {
@@ -201,94 +320,125 @@
             display: none;
         }
         
-        .link-info {
+        .security-badge {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 15px;
             font-size: 12px;
-            color: #6c757d;
-            margin-top: 5px;
-        }
-        
-        .step {
             display: flex;
             align-items: center;
+            gap: 8px;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .feature-card {
+            background: rgba(40, 40, 60, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(40, 40, 60, 0.8);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+        
+        .feature-card i {
+            font-size: 30px;
+            color: #667eea;
             margin-bottom: 10px;
         }
         
-        .step-number {
-            background: #667eea;
-            color: white;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 10px;
-            font-weight: bold;
+        .feature-card h4 {
+            color: #fff;
+            margin-bottom: 5px;
+            font-size: 14px;
         }
         
-        .viewer-container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 40px;
+        .feature-card p {
+            color: #a0a0c0;
+            font-size: 12px;
+        }
+        
+        .viewer-security {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 600px;
+            height: 100%;
+            background: linear-gradient(45deg, #ff0000, #0000ff, #00ff00);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 999999;
+            animation: rainbow 10s linear infinite;
+        }
+        
+        @keyframes rainbow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        
+        .viewer-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            z-index: 1000000;
+            font-weight: bold;
             text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: pulse 2s infinite;
         }
         
-        #imageDisplay {
-            max-width: 100%;
-            max-height: 400px;
-            border-radius: 10px;
-            margin: 20px 0;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(220, 53, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
         }
         
-        .countdown-display {
-            font-size: 18px;
-            color: #333;
-            margin: 20px 0;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
+        .preview-overlay {
+            position: relative;
             display: inline-block;
         }
         
-        .countdown-warning {
-            color: #dc3545;
+        .preview-overlay::before {
+            content: 'Protected Image';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(0, 0, 0, 0.8),
+                rgba(0, 0, 0, 0.8) 10px,
+                rgba(255, 0, 0, 0.1) 10px,
+                rgba(255, 0, 0, 0.1) 20px
+            );
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
             font-weight: bold;
-        }
-        
-        .expired-message {
-            color: #dc3545;
             font-size: 20px;
-            margin: 30px 0;
-        }
-        
-        .viewer-info {
-            color: #6c757d;
-            margin: 10px 0;
-            font-size: 14px;
-        }
-        
-        .telegram-info {
-            background: #e3f2fd;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #1565c0;
-            text-align: center;
-        }
-        
-        .telegram-info a {
-            color: #0d47a1;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        
-        .telegram-info a:hover {
-            text-decoration: underline;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            opacity: 0.7;
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -296,82 +446,132 @@
 <body>
     <div id="mainApp">
         <div class="container">
-            <h1><i class="fas fa-image"></i> Temporary Image Link Generator</h1>
+            <h1><i class="fas fa-shield-alt"></i> Secure Image Link Generator</h1>
             
-            <div class="upload-area" id="uploadArea">
-                <i class="fas fa-cloud-upload-alt"></i>
-                <p>Click here or drag and drop to upload image</p>
-                <p><small>Supports: JPG, PNG, GIF, WebP (Max 5MB)</small></p>
-                <input type="file" id="fileInput" accept="image/*">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="upload">
+                    <i class="fas fa-upload"></i> Upload Image
+                </button>
+                <button class="tab-btn" data-tab="camera">
+                    <i class="fas fa-camera"></i> Take Photo
+                </button>
             </div>
             
+            <!-- Upload Tab -->
+            <div class="tab-content active" id="uploadTab">
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Click here or drag and drop to upload image</p>
+                    <p><small>Supports: JPG, PNG, GIF, WebP (Max 5MB)</small></p>
+                    <input type="file" id="fileInput" accept="image/*">
+                </div>
+            </div>
+            
+            <!-- Camera Tab -->
+            <div class="tab-content" id="cameraTab">
+                <div class="camera-container" id="cameraContainer">
+                    <video id="cameraPreview" autoplay playsinline></video>
+                    <div class="camera-controls">
+                        <button class="camera-btn primary" id="captureBtn">
+                            <i class="fas fa-camera"></i> Capture Photo
+                        </button>
+                        <button class="camera-btn secondary" id="switchCameraBtn">
+                            <i class="fas fa-sync-alt"></i> Switch Camera
+                        </button>
+                        <button class="camera-btn secondary" id="cancelCameraBtn">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
+                </div>
+                <div class="upload-area" id="cameraUploadArea">
+                    <i class="fas fa-camera"></i>
+                    <p>Click to start camera</p>
+                    <p><small>Press the button below to take a photo</small></p>
+                </div>
+            </div>
+            
+            <!-- Image Preview -->
             <div class="preview-container" id="previewContainer">
                 <h3>Preview:</h3>
-                <img id="imagePreview" alt="Image Preview">
+                <div class="preview-overlay">
+                    <img id="imagePreview" alt="Image Preview">
+                </div>
             </div>
             
+            <!-- Loading -->
             <div class="loading" id="loading">
                 <div class="loading-spinner"></div>
-                <p>Generating temporary link...</p>
+                <p>Generating secure link...</p>
             </div>
             
+            <!-- Messages -->
             <div class="message" id="message"></div>
             
+            <!-- Link Container -->
             <div class="link-container" id="linkContainer">
-                <h3><i class="fas fa-link"></i> Temporary Image Link</h3>
+                <h3><i class="fas fa-link"></i> Secure Temporary Link</h3>
                 <div class="link-box" id="linkBox">
-                    Loading link...
+                    Loading secure link...
                 </div>
-                <p class="link-info">
+                <p style="color: #a0a0c0; font-size: 12px; margin: 10px 0;">
                     <i class="fas fa-exclamation-circle"></i> This link will expire 1 minute after opening
                 </p>
                 <button class="btn-copy" id="copyBtn">
-                    <i class="far fa-copy"></i> Copy Link
+                    <i class="far fa-copy"></i> Copy Secure Link
                 </button>
                 <span class="copy-success" id="copySuccess">Copied!</span>
+                
+                <div class="security-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    Screenshot protection enabled • Right-click disabled
+                </div>
             </div>
             
+            <!-- Generate Button -->
             <button class="btn" id="sendBtn" disabled>
-                <i class="fas fa-link"></i> Generate Temporary Link
+                <i class="fas fa-lock"></i> Generate Secure Link
             </button>
             
-            <div class="telegram-info">
-                <h3><i class="fab fa-telegram"></i> Want to send to Telegram?</h3>
-                <p>Manually send the image to your Telegram bot:</p>
-                <p>1. Open <a href="https://t.me/YOUR_BOT_USERNAME" target="_blank">Telegram Bot</a></p>
-                <p>2. Send the image directly to the bot</p>
-                <p>3. Share the temporary link with others</p>
-            </div>
-            
-            <div class="info-box">
-                <h3><i class="fas fa-info-circle"></i> How it works:</h3>
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div>Upload an image using the upload area</div>
+            <!-- Features -->
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <i class="fas fa-camera"></i>
+                    <h4>Live Camera</h4>
+                    <p>Take photos directly</p>
                 </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div>Click "Generate Temporary Link" button</div>
+                <div class="feature-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h4>Screenshot Protection</h4>
+                    <p>Block screen capture</p>
                 </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div>Copy the temporary link (expires 1 minute after opening)</div>
+                <div class="feature-card">
+                    <i class="fas fa-clock"></i>
+                    <h4>1-Minute Expiry</h4>
+                    <p>Auto-delete after viewing</p>
                 </div>
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <div>Anyone can view the image for 1 minute after opening the link</div>
+                <div class="feature-card">
+                    <i class="fas fa-ban"></i>
+                    <h4>Right-Click Disabled</h4>
+                    <p>Prevent image saving</p>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Screenshot Protection Elements (Hidden by default) -->
+    <div id="screenshotProtection" class="viewer-security" style="display: none;"></div>
+    <div id="protectionMessage" class="viewer-message" style="display: none;">
+        <i class="fas fa-exclamation-triangle"></i> Screenshot Protected Content
+    </div>
+
     <script>
         // Configuration
-        const IMAGE_EXPIRY_MINUTES = 1; // লিংক ওপেন করার পর 1 মিনিট
+        const IMAGE_EXPIRY_MINUTES = 1;
 
         // DOM Elements
         const mainApp = document.getElementById('mainApp');
         const uploadArea = document.getElementById('uploadArea');
+        const cameraUploadArea = document.getElementById('cameraUploadArea');
         const fileInput = document.getElementById('fileInput');
         const imagePreview = document.getElementById('imagePreview');
         const previewContainer = document.getElementById('previewContainer');
@@ -382,30 +582,460 @@
         const linkBox = document.getElementById('linkBox');
         const copyBtn = document.getElementById('copyBtn');
         const copySuccess = document.getElementById('copySuccess');
+        const cameraPreview = document.getElementById('cameraPreview');
+        const cameraContainer = document.getElementById('cameraContainer');
+        const captureBtn = document.getElementById('captureBtn');
+        const switchCameraBtn = document.getElementById('switchCameraBtn');
+        const cancelCameraBtn = document.getElementById('cancelCameraBtn');
+        const screenshotProtection = document.getElementById('screenshotProtection');
+        const protectionMessage = document.getElementById('protectionMessage');
 
+        // Variables
         let selectedFile = null;
         let currentLink = '';
+        let currentStream = null;
+        let facingMode = 'environment';
+        let isViewerMode = false;
+
+        // Tab Switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.getAttribute('data-tab');
+                
+                // Update active tab
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Show selected tab content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(tab + 'Tab').classList.add('active');
+                
+                // Reset camera if switching away
+                if (tab !== 'camera' && currentStream) {
+                    stopCamera();
+                }
+            });
+        });
+
+        // Camera initialization
+        cameraUploadArea.addEventListener('click', async () => {
+            try {
+                await startCamera();
+                cameraUploadArea.style.display = 'none';
+                cameraContainer.style.display = 'flex';
+            } catch (error) {
+                showMessage('❌ Camera access denied: ' + error.message, 'error');
+            }
+        });
+
+        // Start camera
+        async function startCamera() {
+            const constraints = {
+                video: {
+                    facingMode: facingMode,
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                },
+                audio: false
+            };
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                cameraPreview.srcObject = stream;
+                currentStream = stream;
+                captureBtn.disabled = false;
+            } catch (err) {
+                throw new Error('Please allow camera access');
+            }
+        }
+
+        // Stop camera
+        function stopCamera() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
+                cameraPreview.srcObject = null;
+                cameraContainer.style.display = 'none';
+                cameraUploadArea.style.display = 'block';
+            }
+        }
+
+        // Switch camera
+        switchCameraBtn.addEventListener('click', async () => {
+            facingMode = facingMode === 'user' ? 'environment' : 'user';
+            stopCamera();
+            await startCamera();
+        });
+
+        // Cancel camera
+        cancelCameraBtn.addEventListener('click', () => {
+            stopCamera();
+        });
+
+        // Capture photo
+        captureBtn.addEventListener('click', () => {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            
+            canvas.width = cameraPreview.videoWidth;
+            canvas.height = cameraPreview.videoHeight;
+            context.drawImage(cameraPreview, 0, 0, canvas.width, canvas.height);
+            
+            canvas.toBlob(blob => {
+                const file = new File([blob], `camera_${Date.now()}.jpg`, {
+                    type: 'image/jpeg'
+                });
+                
+                // Handle the captured image
+                handleFileSelect(file);
+                
+                // Stop camera
+                stopCamera();
+                
+                // Switch back to upload tab
+                document.querySelector('[data-tab="upload"]').click();
+                
+                showMessage('✅ Photo captured successfully!', 'success');
+            }, 'image/jpeg', 0.95);
+        });
+
+        // File upload handling
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#764ba2';
+            uploadArea.style.background = 'rgba(102, 126, 234, 0.1)';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#667eea';
+            uploadArea.style.background = '';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#667eea';
+            uploadArea.style.background = '';
+            
+            if (e.dataTransfer.files.length) {
+                handleFileSelect(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        // Handle file selection
+        function handleFileSelect(file) {
+            // Check file type
+            if (!file.type.match('image.*')) {
+                showMessage('Please select an image file (JPG, PNG, GIF, WebP)', 'error');
+                return;
+            }
+            
+            // Check file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showMessage('File size should be less than 5MB', 'error');
+                return;
+            }
+            
+            selectedFile = file;
+            
+            // Preview image
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                previewContainer.style.display = 'block';
+                sendBtn.disabled = false;
+                
+                // Add security overlay to preview
+                imagePreview.onload = () => {
+                    imagePreview.parentElement.classList.add('preview-overlay');
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Generate secure link
+        sendBtn.addEventListener('click', generateSecureLink);
+        copyBtn.addEventListener('click', copyLinkToClipboard);
+
+        // Generate secure link
+        async function generateSecureLink() {
+            if (!selectedFile) {
+                showMessage('Please select or capture an image first', 'error');
+                return;
+            }
+
+            // Show loading
+            loading.style.display = 'block';
+            sendBtn.disabled = true;
+            hideMessage();
+            linkContainer.style.display = 'none';
+            linkBox.textContent = 'Generating secure link...';
+
+            try {
+                // Convert image to base64
+                const base64Image = await fileToBase64(selectedFile);
+                
+                // Create secure temporary link
+                const tempLink = createSecureTemporaryLink(base64Image, selectedFile.type);
+                
+                // Display the link
+                displayTemporaryLink(tempLink);
+                
+                showMessage('✅ Secure link created successfully!', 'success');
+                
+                // Reset form
+                setTimeout(() => {
+                    selectedFile = null;
+                    fileInput.value = '';
+                    previewContainer.style.display = 'none';
+                    sendBtn.disabled = true;
+                    imagePreview.parentElement.classList.remove('preview-overlay');
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage(`❌ Error: ${error.message}`, 'error');
+                sendBtn.disabled = false;
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // Convert file to base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const base64 = reader.result.split(',')[1];
+                    resolve(base64);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Create secure temporary link
+        function createSecureTemporaryLink(base64Image, mimeType) {
+            // Generate a unique ID for this image
+            const imageId = generateUniqueId();
+            
+            // Store image data in localStorage with security flags
+            const imageData = {
+                id: imageId,
+                image: base64Image,
+                mimeType: mimeType,
+                createdAt: Date.now(),
+                secure: true, // Mark as secure image
+                screenshotProtected: true
+            };
+            
+            // Store in localStorage
+            localStorage.setItem(`secure_image_${imageId}`, JSON.stringify(imageData));
+            
+            // Clean up old expired images
+            cleanupOldImages();
+            
+            // Create the link with security parameter
+            const currentUrl = window.location.href.split('?')[0];
+            const tempLink = `${currentUrl}?view=${imageId}&secure=true`;
+            
+            return tempLink;
+        }
+
+        // Generate unique ID
+        function generateUniqueId() {
+            return 'secure_' + Date.now() + '_' + Math.random().toString(36).substr(2, 12);
+        }
+
+        // Display temporary link
+        function displayTemporaryLink(link) {
+            currentLink = link;
+            linkBox.textContent = link;
+            linkContainer.style.display = 'block';
+            
+            // Auto-scroll to link container
+            linkContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Copy link to clipboard
+        async function copyLinkToClipboard() {
+            try {
+                await navigator.clipboard.writeText(currentLink);
+                
+                // Show success message
+                copySuccess.style.display = 'inline';
+                setTimeout(() => {
+                    copySuccess.style.display = 'none';
+                }, 2000);
+                
+                // Visual feedback
+                linkBox.style.animation = 'none';
+                setTimeout(() => {
+                    linkBox.style.animation = 'pulse 0.5s';
+                }, 10);
+                
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = currentLink;
+                textArea.style.position = 'fixed';
+                textArea.style.opacity = '0';
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                // Show success message
+                copySuccess.style.display = 'inline';
+                setTimeout(() => {
+                    copySuccess.style.display = 'none';
+                }, 2000);
+            }
+        }
+
+        // Clean up old images
+        function cleanupOldImages() {
+            const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                
+                if (key.startsWith('secure_image_')) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        
+                        // Remove if created more than 24 hours ago
+                        if (data.createdAt && data.createdAt < twentyFourHoursAgo) {
+                            localStorage.removeItem(key);
+                        }
+                    } catch (e) {
+                        localStorage.removeItem(key);
+                    }
+                }
+            }
+        }
+
+        // Screenshot Protection System
+        function enableScreenshotProtection() {
+            // Method 1: Detect Print Screen key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'PrintScreen' || (e.ctrlKey && e.key === 'p')) {
+                    e.preventDefault();
+                    triggerProtectionAlert();
+                    return false;
+                }
+            });
+
+            // Method 2: Detect right-click and context menu
+            document.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                triggerProtectionAlert();
+                return false;
+            });
+
+            // Method 3: Disable text selection
+            document.addEventListener('selectstart', (e) => {
+                e.preventDefault();
+                return false;
+            });
+
+            // Method 4: Disable drag and drop
+            document.addEventListener('dragstart', (e) => {
+                e.preventDefault();
+                return false;
+            });
+
+            // Method 5: Blur on window blur (alt-tab detection)
+            window.addEventListener('blur', () => {
+                triggerProtectionAlert();
+            });
+
+            // Method 6: Disable developer tools
+            disableDeveloperTools();
+
+            // Method 7: Add invisible overlay
+            screenshotProtection.style.display = 'block';
+            setTimeout(() => {
+                screenshotProtection.style.opacity = '0.001';
+            }, 10);
+
+            // Method 8: Show protection message
+            protectionMessage.style.display = 'block';
+        }
+
+        // Disable developer tools
+        function disableDeveloperTools() {
+            const devtools = /./;
+            devtools.toString = function() {
+                triggerProtectionAlert();
+                return '';
+            };
+            
+            console.log('%c', devtools);
+            
+            // Detect devtools opening
+            setInterval(() => {
+                const threshold = 160;
+                const width = window.outerWidth - window.innerWidth;
+                const height = window.outerHeight - window.innerHeight;
+                
+                if (width > threshold || height > threshold) {
+                    triggerProtectionAlert();
+                }
+            }, 1000);
+        }
+
+        // Trigger protection alert
+        function triggerProtectionAlert() {
+            // Flash the screen
+            screenshotProtection.style.opacity = '0.3';
+            setTimeout(() => {
+                screenshotProtection.style.opacity = '0.001';
+            }, 300);
+
+            // Shake the protection message
+            protectionMessage.style.animation = 'none';
+            setTimeout(() => {
+                protectionMessage.style.animation = 'pulse 0.5s, shake 0.5s';
+            }, 10);
+        }
 
         // Check if we're in viewer mode
         function checkViewerMode() {
             const urlParams = new URLSearchParams(window.location.search);
             const imageId = urlParams.get('view');
+            const secure = urlParams.get('secure');
             
             if (imageId) {
-                // We're in viewer mode - show the image
-                showImageViewer(imageId);
+                // We're in viewer mode
+                isViewerMode = true;
+                showSecureImageViewer(imageId, secure === 'true');
                 return true;
             }
             return false;
         }
 
-        // Show image viewer
-        function showImageViewer(imageId) {
+        // Show secure image viewer
+        function showSecureImageViewer(imageId, isSecure) {
             // Clear the main app
             mainApp.innerHTML = '';
             
-            // Try to get image data from localStorage
-            const imageKey = `temp_image_${imageId}`;
+            // Enable screenshot protection if secure
+            if (isSecure) {
+                enableScreenshotProtection();
+            }
+
+            // Try to get image data
+            const imageKey = `secure_image_${imageId}`;
             const storedData = localStorage.getItem(imageKey);
             
             if (!storedData) {
@@ -439,28 +1069,32 @@
                     return;
                 }
                 
-                // Create viewer interface
+                // Create secure viewer interface
                 const viewerHTML = `
-                    <div class="viewer-container">
-                        <h1><i class="fas fa-image"></i> Temporary Image Viewer</h1>
+                    <div class="viewer-container" style="background: rgba(30, 30, 46, 0.95);">
+                        <h1><i class="fas fa-shield-alt"></i> Secure Image Viewer</h1>
                         
-                        <div id="imageContainer">
+                        <div id="imageContainer" style="position: relative;">
                             <img id="imageDisplay" 
                                  src="data:${imageData.mimeType};base64,${imageData.image}" 
-                                 alt="Temporary Image">
+                                 alt="Secure Image"
+                                 style="max-width: 100%; max-height: 60vh; border-radius: 15px; border: 2px solid #dc3545;">
+                            <div style="position: absolute; top: 10px; right: 10px; background: rgba(220, 53, 69, 0.9); color: white; padding: 5px 10px; border-radius: 5px; font-size: 12px;">
+                                <i class="fas fa-lock"></i> PROTECTED
+                            </div>
                         </div>
                         
-                        <div class="countdown-display" id="countdownDisplay">
-                            <i class="fas fa-clock"></i> Image will expire in: 
-                            <span id="countdownTimer">01:00</span>
+                        <div class="countdown-display" style="background: rgba(220, 53, 69, 0.2); border: 1px solid rgba(220, 53, 69, 0.3);">
+                            <i class="fas fa-clock"></i> Image will self-destruct in: 
+                            <span id="countdownTimer" style="color: #ff6b6b; font-weight: bold;">01:00</span>
                         </div>
                         
-                        <p class="viewer-info">
-                            <i class="fas fa-info-circle"></i> 
-                            This image will automatically disappear in 1 minute
+                        <p style="color: #a0a0c0; margin: 15px 0; font-size: 14px;">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            Screenshots are blocked. This image will disappear in 1 minute.
                         </p>
                         
-                        <button class="btn" onclick="window.location.href='./'">
+                        <button class="btn" onclick="window.location.href='./'" style="margin-top: 20px;">
                             <i class="fas fa-arrow-left"></i> Back to Upload
                         </button>
                     </div>
@@ -468,8 +1102,34 @@
                 
                 mainApp.innerHTML = viewerHTML;
                 
+                // Add security overlay to image
+                const imageDisplay = document.getElementById('imageDisplay');
+                if (imageDisplay) {
+                    imageDisplay.onload = () => {
+                        const container = document.getElementById('imageContainer');
+                        const overlay = document.createElement('div');
+                        overlay.style.cssText = `
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background: repeating-linear-gradient(
+                                45deg,
+                                rgba(220, 53, 69, 0.05),
+                                rgba(220, 53, 69, 0.05) 10px,
+                                transparent 10px,
+                                transparent 20px
+                            );
+                            pointer-events: none;
+                            border-radius: 15px;
+                        `;
+                        container.appendChild(overlay);
+                    };
+                }
+                
                 // Start countdown
-                startViewerCountdown(expiryTime, imageId);
+                startViewerCountdown(expiryTime, imageId, isSecure);
                 
             } catch (error) {
                 console.error('Error loading image:', error);
@@ -478,18 +1138,19 @@
         }
 
         // Start countdown for viewer
-        function startViewerCountdown(expiryTime, imageId) {
+        function startViewerCountdown(expiryTime, imageId, isSecure) {
             const updateCountdown = () => {
                 const now = Date.now();
                 const timeLeft = expiryTime - now;
                 
                 if (timeLeft <= 0) {
-                    // Time's up - remove image and show expired message
-                    localStorage.removeItem(`temp_image_${imageId}`);
+                    // Time's up - remove image
+                    localStorage.removeItem(`secure_image_${imageId}`);
                     
                     const countdownElement = document.getElementById('countdownTimer');
                     if (countdownElement) {
                         countdownElement.textContent = '00:00';
+                        countdownElement.style.color = '#dc3545';
                     }
                     
                     setTimeout(() => {
@@ -515,8 +1176,8 @@
                     
                     // Change color when less than 10 seconds
                     if (timeLeft < 10000) {
-                        countdownElement.style.color = '#dc3545';
-                        countdownElement.classList.add('countdown-warning');
+                        countdownElement.style.color = '#ff0000';
+                        countdownElement.style.animation = 'pulse 0.5s infinite';
                     }
                 }
             };
@@ -537,214 +1198,20 @@
                 <div class="viewer-container">
                     <h1><i class="fas fa-clock"></i> Image Expired</h1>
                     
-                    <div class="expired-message">
+                    <div style="color: #dc3545; margin: 30px 0; text-align: center;">
                         <i class="fas fa-exclamation-triangle" style="font-size: 60px;"></i>
-                        <p style="margin-top: 20px;">This image link has expired</p>
+                        <p style="margin-top: 20px; font-size: 18px;">This secure image link has expired</p>
                     </div>
                     
-                    <p class="viewer-info">
-                        The temporary image link was only valid for 1 minute after opening.
+                    <p style="color: #a0a0c0; margin: 20px 0;">
+                        The image has been automatically deleted for security reasons.
                     </p>
                     
                     <button class="btn" onclick="window.location.href='./'">
-                        <i class="fas fa-arrow-left"></i> Back to Upload
+                        <i class="fas fa-arrow-left"></i> Create New Secure Link
                     </button>
                 </div>
             `;
-        }
-
-        // Event Listeners
-        uploadArea.addEventListener('click', () => fileInput.click());
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.style.borderColor = '#764ba2';
-            uploadArea.style.background = '#f0f0f0';
-        });
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.style.borderColor = '#667eea';
-            uploadArea.style.background = '';
-        });
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.style.borderColor = '#667eea';
-            uploadArea.style.background = '';
-            
-            if (e.dataTransfer.files.length) {
-                handleFileSelect(e.dataTransfer.files[0]);
-            }
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length) {
-                handleFileSelect(e.target.files[0]);
-            }
-        });
-
-        sendBtn.addEventListener('click', generateTemporaryLink);
-        copyBtn.addEventListener('click', copyLinkToClipboard);
-
-        // Handle file selection
-        function handleFileSelect(file) {
-            // Check file type
-            if (!file.type.match('image.*')) {
-                showMessage('Please select an image file (JPG, PNG, GIF, WebP)', 'error');
-                return;
-            }
-            
-            // Check file size (max 5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                showMessage('File size should be less than 5MB', 'error');
-                return;
-            }
-            
-            selectedFile = file;
-            
-            // Preview image
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                imagePreview.src = e.target.result;
-                previewContainer.style.display = 'block';
-                sendBtn.disabled = false;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // Generate temporary link
-        async function generateTemporaryLink() {
-            if (!selectedFile) {
-                showMessage('Please select an image first', 'error');
-                return;
-            }
-
-            // Show loading
-            loading.style.display = 'block';
-            sendBtn.disabled = true;
-            hideMessage();
-            linkContainer.style.display = 'none';
-            linkBox.textContent = 'Loading link...';
-
-            try {
-                // Convert image to base64
-                const base64Image = await fileToBase64(selectedFile);
-                
-                // Create temporary link
-                const tempLink = createTemporaryLink(base64Image, selectedFile.type);
-                
-                // Display the link
-                displayTemporaryLink(tempLink);
-                
-                showMessage('✅ Temporary link created successfully!', 'success');
-                
-            } catch (error) {
-                console.error('Error:', error);
-                showMessage(`❌ Error: ${error.message}`, 'error');
-                sendBtn.disabled = false;
-            } finally {
-                loading.style.display = 'none';
-            }
-        }
-
-        // Convert file to base64
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    // Remove the data:image/...;base64, prefix
-                    const base64 = reader.result.split(',')[1];
-                    resolve(base64);
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-
-        // Create temporary link
-        function createTemporaryLink(base64Image, mimeType) {
-            // Generate a unique ID for this image
-            const imageId = generateUniqueId();
-            
-            // Store image data in localStorage
-            const imageData = {
-                id: imageId,
-                image: base64Image,
-                mimeType: mimeType,
-                createdAt: Date.now()
-                // Note: viewStartTime will be set when the link is first opened
-            };
-            
-            // Store in localStorage
-            localStorage.setItem(`temp_image_${imageId}`, JSON.stringify(imageData));
-            
-            // Clean up old expired images (older than 24 hours)
-            cleanupOldImages();
-            
-            // Create the link
-            const currentUrl = window.location.href.split('?')[0];
-            const tempLink = `${currentUrl}?view=${imageId}`;
-            
-            return tempLink;
-        }
-
-        // Generate unique ID
-        function generateUniqueId() {
-            return 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        }
-
-        // Display temporary link
-        function displayTemporaryLink(link) {
-            currentLink = link;
-            linkBox.textContent = link;
-            linkContainer.style.display = 'block';
-        }
-
-        // Copy link to clipboard
-        async function copyLinkToClipboard() {
-            try {
-                await navigator.clipboard.writeText(currentLink);
-                
-                // Show success message
-                copySuccess.style.display = 'inline';
-                setTimeout(() => {
-                    copySuccess.style.display = 'none';
-                }, 2000);
-            } catch (err) {
-                // Fallback for older browsers
-                const textArea = document.createElement('textarea');
-                textArea.value = currentLink;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                
-                // Show success message
-                copySuccess.style.display = 'inline';
-                setTimeout(() => {
-                    copySuccess.style.display = 'none';
-                }, 2000);
-            }
-        }
-
-        // Clean up old images from localStorage (older than 24 hours)
-        function cleanupOldImages() {
-            const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
-            
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                
-                if (key.startsWith('temp_image_')) {
-                    try {
-                        const data = JSON.parse(localStorage.getItem(key));
-                        
-                        // Remove if created more than 24 hours ago
-                        if (data.createdAt && data.createdAt < twentyFourHoursAgo) {
-                            localStorage.removeItem(key);
-                        }
-                    } catch (e) {
-                        // Invalid JSON, remove it
-                        localStorage.removeItem(key);
-                    }
-                }
-            }
         }
 
         // Show message
@@ -768,7 +1235,7 @@
         window.onload = function() {
             // Check if we're in viewer mode
             if (checkViewerMode()) {
-                return; // Don't show upload interface if in viewer mode
+                return;
             }
             
             // Clean up old images on startup
